@@ -67,24 +67,46 @@ const restartGame = () => {
 const startGame = (difficulty) => {
     switch (difficulty) {
         case 'easy':
-            gameSpeed = 200; // Slower speed for easy
+            gameSpeed = 125; // Slower speed for easy
             break;
         case 'medium':
-            gameSpeed = 125; // Medium speed
+            gameSpeed = 100; // Medium speed
             break;
         case 'hard':
             gameSpeed = 75; // Faster speed for hard
+            break;
+        case 'impossible':
+            gameSpeed = 30; // Faster speed for impossible
             break;
     }
 
     // Hide the difficulty modal
     document.getElementById("difficultyModal").style.display = "none";
 
+    // Show the mode modal
+
+    document.getElementById("wallsWrapModal").style.display = "block";
+
     // Initialize the food position
     changeFoodPosition();
 
     // Start the game with the selected speed
     gameInterval = setInterval(initGame, gameSpeed);
+}
+
+let gameWalls = false;
+
+function changeModeWall() {
+    gameWalls = true;
+    console.log('wall');
+    document.getElementById("wallsWrapModal").style.display = "none";
+}
+
+
+function changeModeWrap() {
+    gameWalls = false;
+    console.log('wrap');
+    document.getElementById("wallsWrapModal").style.display = "none";
 }
 
 // Main function to update the game state
@@ -98,10 +120,37 @@ const initGame = () => {
     snakeY += velocityY;
 
     // Check for border collision (game over condition)
-    if (snakeX < 1 || snakeX > 30 || snakeY < 1 || snakeY > 30) {
-        gameOver();
-        return;
+
+    if (gameWalls) {
+        console.log('aaaa')
+        if (snakeX < 1 || snakeX > 30 || snakeY < 1 || snakeY > 30) {
+            gameOver();
+            return;
+
+        }
+    } else {
+        if (snakeX < 1) {
+            snakeX = 30
+            velocityX = -1;
+            velocityY = 0;
+        }
+        if (snakeX > 30) {
+            snakeX = 1
+            velocityX = 1;
+            velocityY = 0;
+        }
+        if (snakeY < 1) {
+            snakeY = 30
+            velocityX = 0;
+            velocityY = -1;
+        }
+        if (snakeY > 30) {
+            snakeY = 1
+            velocityX = 0;
+            velocityY = 1;
+        }
     }
+
 
     // Check for self-collision (game over condition)
     for (let i = 0; i < snakeBody.length; i++) {
@@ -149,6 +198,10 @@ const initGame = () => {
 
 // Show the difficulty selection modal on page load
 document.getElementById("difficultyModal").style.display = "flex";
+
+// Hideh the mode modal on page load
+
+document.getElementById("wallsWrapModal").style.display = "none";
 
 // Add event listener for keypress to change the snake's direction
 document.addEventListener('keydown', changeDirection);
