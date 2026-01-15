@@ -8,6 +8,7 @@ let highScore = localStorage.getItem("highScore") || 0;
 let gameInterval;
 let GameOver = false;
 let gameSpeed = 125; // Default game speed
+let changingDirection = false;
 
 // Function to change the food position to a random location
 const changeFoodPosition = () => {
@@ -18,18 +19,22 @@ const changeFoodPosition = () => {
 // Function to change the direction of the snake based on arrow keys
 const changeDirection = (e) => {
     // Prevent the snake from reversing direction
-    if (e.key === "ArrowUp" && velocityY !== 1) {
+    if (e.key === "ArrowUp" && velocityY !== 1 && changingDirection == false) {
         velocityX = 0;
         velocityY = -1;
-    } else if (e.key === "ArrowDown" && velocityY !== -1) {
+        changingDirection = true;
+    } else if (e.key === "ArrowDown" && velocityY !== -1 && changingDirection == false) {
         velocityX = 0;
         velocityY = 1;
-    } else if (e.key === "ArrowRight" && velocityX !== -1) {
+        changingDirection = true;
+    } else if (e.key === "ArrowRight" && velocityX !== -1 && changingDirection == false) {
         velocityX = 1;
         velocityY = 0;
-    } else if (e.key === "ArrowLeft" && velocityX !== 1) {
+        changingDirection = true;
+    } else if (e.key === "ArrowLeft" && velocityX !== 1 && changingDirection == false) {
         velocityX = -1;
         velocityY = 0;
+        changingDirection = true;
     }
 }
 
@@ -42,7 +47,7 @@ const gameOver = () => {
 }
 
 // Function to restart the game
-const restartGame = () => {
+const restartGame = () => { 
     // Reset game state
     snakeX = 5;
     snakeY = 10;
@@ -87,11 +92,6 @@ const startGame = (difficulty) => {
 
     document.getElementById("wallsWrapModal").style.display = "block";
 
-    // Initialize the food position
-    changeFoodPosition();
-
-    // Start the game with the selected speed
-    gameInterval = setInterval(initGame, gameSpeed);
 }
 
 let gameWalls = false;
@@ -100,6 +100,12 @@ function changeModeWall() {
     gameWalls = true;
     console.log('wall');
     document.getElementById("wallsWrapModal").style.display = "none";
+
+    // Initialize the food position
+    changeFoodPosition();
+
+    // Start the game with the selected speed
+    gameInterval = setInterval(initGame, gameSpeed);
 }
 
 
@@ -107,6 +113,12 @@ function changeModeWrap() {
     gameWalls = false;
     console.log('wrap');
     document.getElementById("wallsWrapModal").style.display = "none";
+
+    // Initialize the food position
+    changeFoodPosition();
+
+    // Start the game with the selected speed
+    gameInterval = setInterval(initGame, gameSpeed);
 }
 
 // Main function to update the game state
@@ -122,7 +134,6 @@ const initGame = () => {
     // Check for border collision (game over condition)
 
     if (gameWalls) {
-        console.log('aaaa')
         if (snakeX < 1 || snakeX > 30 || snakeY < 1 || snakeY > 30) {
             gameOver();
             return;
@@ -192,16 +203,18 @@ const initGame = () => {
         htmlMarkup += `<div class="body" style='grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}'></div>`;
     }
 
+    changingDirection = false;
+
     // Update the play board with the new positions
     playBoard.innerHTML = htmlMarkup;
 }
 
-// Show the difficulty selection modal on page load
-document.getElementById("difficultyModal").style.display = "flex";
-
-// Hideh the mode modal on page load
+// Hide the mode modal on page load
 
 document.getElementById("wallsWrapModal").style.display = "none";
+
+// Show the difficulty selection modal on page load
+document.getElementById("difficultyModal").style.display = "flex";
 
 // Add event listener for keypress to change the snake's direction
 document.addEventListener('keydown', changeDirection);
